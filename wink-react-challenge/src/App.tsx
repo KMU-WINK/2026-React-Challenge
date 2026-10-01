@@ -32,7 +32,7 @@ const tabs = ["전체", "질문", "자유", "정보"];
 
 export default function App() {
   return (
-    <div className="mx-auto my-10 min-h-[844px] w-[390px] overflow-hidden rounded-frame bg-bg shadow-[0_12px_40px_rgba(20,22,26,0.1)]">
+    <div className="mx-auto my-10 min-h-[844px] w-full max-w-[390px] overflow-hidden rounded-frame bg-bg shadow-[0_12px_40px_rgba(20,22,26,0.1)]">
       <header className="flex flex-col gap-4 border-b border-border bg-surface px-5 pt-5 pb-[13px]">
         <div className="flex items-center justify-between">
           <h1 className="text-title font-bold tracking-[-0.01em] text-text">
