@@ -1,0 +1,36 @@
+@import 'tailwindcss';
+@import 'pretendard/dist/web/static/pretendard.css';
+
+@theme {
+  /*COLOR*/
+  --color-primary: #4c6ef5;
+  --color-like: #f2405d;
+  --color-text: #14161a;
+  --color-text-body: #4a5058;
+  --color-text-secondary: #8a9099;
+  --color-border: #e8eaee;
+  --color-surface: #ffffff;
+  --color-bg: #f7f8fa;
+  --color-icon: #6b7280;
+  --color-chat: #f1f3f6;
+  --color-like-soft: #fff1f3; /* 좋아요 켜짐 배경 */
+  --color-like-line: #ffd9df; /* 좋아요 켜짐 테두리 */
+  --color-primary-soft: #eef1ff; /* 북마크 켜짐 배경 */
+  --color-primary-line: #c9d4fc; /* 북마크 켜짐 테두리 */
+
+  /* TYPE */
+  --text-title: 20px;
+  --text-heading: 20px;
+  --text-body: 14px;
+  --text-label: 13px;
+  --text-caption: 12px;
+
+  /*FONT*/
+  --font-sans: 'Pretendard', system-ui, sans-serif;
+
+  /* RADIUS*/
+  --radius-sm: 8px;
+  --radius-card: 16px;
+  --radius-frame: 20px;
+  --radius-full: 999px;
+}
