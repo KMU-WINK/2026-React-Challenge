@@ -22,10 +22,8 @@
   --text-caption: 12px;
 
   --font-weight-regular: 400;
-  --font-weight-medium: 600;
+  --font-weight-medium: 500;
   --font-weight-bold: 700;
-
-  --leading-body: 1.6;
 
 
   /* Spacing */
@@ -40,7 +38,7 @@
 
   /* Radius */
   --radius-sm: 8px;
-  --radius-md: 16px;
-  --radius-lg: 24px;
+  --radius-card: 16px;
+  --radius-frame: 24px;
   --radius-full: 999px;
 }
