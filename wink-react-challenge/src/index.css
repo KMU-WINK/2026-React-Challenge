@@ -1,0 +1,30 @@
+@import "pretendard/dist/web/static/pretendard.css";
+@import "tailwindcss";
+
+body {
+  background-color: var(--color-bg);
+  color: var(--color-text);
+}
+
+@theme {
+  --color-primary: #4c6ef5;
+  --color-like: #f2405d;
+  --color-text: #14161a;
+  --color-text-body: #4a5058;
+  --color-text-secondary: #8a9099;
+  --color-border: #e8eaee;
+  --color-surface: #ffffff;
+  --color-bg: #f7f8fa;
+
+  --text-title: 20px;
+  --text-heading: 16px;
+  --text-body: 14px;
+  --text-label: 13px;
+  --text-caption: 12px;
+
+  --radius-sm: 8px;
+  --radius-card: 16px;
+  --radius-frame: 20px;
+
+  --font-sans: "Pretendard", ui-sans-serif, system-ui, sans-serif;
+}
