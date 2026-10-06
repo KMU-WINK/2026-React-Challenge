@@ -25,3 +25,7 @@ body {
   font-family: Pretendard, sans-serif;
   background-color: var(--color-bg);
 }
+
+button {
+  cursor: pointer;
+}
