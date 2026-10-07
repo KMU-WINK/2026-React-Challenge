@@ -24,3 +24,6 @@
   --radius-frame: 20px;
   --radius-full: 999px;
 }
+button {
+  cursor: pointer;
+}
