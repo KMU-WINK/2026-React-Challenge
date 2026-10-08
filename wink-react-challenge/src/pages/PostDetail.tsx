@@ -1,74 +1,87 @@
-// src/pages/PostDetail.tsx
-import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { posts } from '../data/posts';
+import useToggle from '../hooks/useToggle';
+import CountPill from '../components/CountPill';
 import BookmarkButton from '../components/BookmarkButton';
 import CommentSection from '../components/CommentSection';
+import heartIcon from '../assets/heart.svg';
+import heartFilledIcon from '../assets/heart-fill.svg';
 
 function PostDetail() {
   const { id } = useParams();
   const post = posts.find((p) => p.id === Number(id));
-  const [isBookmarked, setIsBookmarked] = useState(false);
+  const [isLiked, toggleLiked] = useToggle(false);
+  const [isBookmarked, toggleBookmarked] = useToggle(false);
 
-  if (!post) return <p>게시글을 찾을 수 없어요.</p>;
+  if (!post)
+    return <p className="text-body text-text-body">게시글을 찾을 수 없어요.</p>;
+
+  const likeCount = post.likeCount + (isLiked ? 1 : 0);
 
   return (
-    <div className="w-96 min-h-[844px] bg-white rounded-[20px] flex flex-col justify-start items-start overflow-hidden">
-      {/* 상단 헤더: 뒤로가기 / 제목 / 더보기 */}
-      <div className="self-stretch px-5 py-5 border-b border-gray-200 inline-flex justify-between items-center">
-        <Link to="/" className="text-neutral-900 text-lg font-normal">
+    <div className="w-[390px] min-h-[844px] flex flex-col bg-surface rounded-frame overflow-hidden shadow-[0_12px_40px_0_rgba(20,22,26,0.1)]">
+      {/* 상단 바 */}
+      <header className="flex items-center justify-between px-5 py-5 border-b border-border">
+        <Link
+          to="/"
+          aria-label="뒤로 가기"
+          className="w-6 text-left text-[18px] text-text"
+        >
           ←
         </Link>
-        <div className="text-neutral-900 text-sm font-bold">게시글</div>
-        <div className="text-neutral-400 text-lg font-normal">⋯</div>
-      </div>
+        <h1 className="text-body font-bold text-text">게시글</h1>
+        <button
+          aria-label="더보기"
+          className="w-6 text-right text-[18px] text-text-secondary"
+        >
+          ⋯
+        </button>
+      </header>
 
-      <div className="self-stretch flex-1 p-5 flex flex-col justify-start items-start gap-5">
-        {/* 작성자 정보 */}
-        <div className="self-stretch inline-flex justify-start items-center gap-2.5">
-          <div className="size-10 bg-gray-200 rounded-full"></div>
-          <div className="flex flex-col justify-start items-start gap-0.5">
-            <div className="text-neutral-900 text-sm font-bold">
-              {post.author}
-            </div>
-            <div className="text-neutral-400 text-xs font-normal">
+      <main className="flex-1 flex flex-col gap-5 p-5">
+        {/* 작성자 */}
+        <div className="flex items-center gap-2.5">
+          <div className="size-10 shrink-0 rounded-full bg-border" />
+          <div className="flex flex-col gap-0.5">
+            <span className="text-body font-bold text-text">{post.author}</span>
+            <span className="text-caption text-text-secondary">
               {post.timeLabel}
-            </div>
+            </span>
           </div>
         </div>
 
         {/* 제목 + 본문 */}
-        <div className="self-stretch flex flex-col justify-start items-start gap-3">
-          <div className="text-neutral-900 text-xl font-bold leading-7">
+        <div className="flex flex-col gap-3">
+          <h2 className="text-title font-bold text-text leading-[28px] tracking-[-0.2px]">
             {post.title}
-          </div>
-          <div className="text-zinc-600 text-sm font-normal leading-6">
-            {post.body}
-          </div>
+          </h2>
+          <p className="text-body text-text-body leading-[1.75]">{post.body}</p>
         </div>
 
-        {/* 좋아요 / 댓글 / 북마크 줄 */}
-        <div className="self-stretch py-3.5 flex justify-between items-center border-t border-b border-gray-200">
+        {/* 좋아요 / 댓글 / 북마크 */}
+        <div className="flex items-center justify-between h-[59px] border-y border-border">
           <div className="flex items-center gap-2">
-            <div className="px-2.5 py-1.5 rounded-full outline outline-1 outline-offset-[-1px] outline-gray-200 flex items-center gap-1.5">
-              <div className="text-gray-500 text-xs font-medium">
-                ♡ {post.likeCount}
-              </div>
-            </div>
-            <div className="px-2.5 py-1.5 rounded-full outline outline-1 outline-offset-[-1px] outline-gray-200 flex items-center gap-1.5">
-              <div className="text-gray-500 text-xs font-medium">
-                댓글 {post.commentCount}
-              </div>
-            </div>
+            <CountPill isActive={isLiked} onClick={toggleLiked}>
+              <img
+                src={isLiked ? heartFilledIcon : heartIcon}
+                alt=""
+                className="size-4"
+              />
+              {likeCount}
+            </CountPill>
+            <CountPill>
+              <span>댓글</span>
+              <span>{post.commentCount}</span>
+            </CountPill>
           </div>
           <BookmarkButton
             isBookmarked={isBookmarked}
-            onToggle={() => setIsBookmarked(!isBookmarked)}
+            onToggle={toggleBookmarked}
           />
         </div>
 
         <CommentSection />
-      </div>
+      </main>
     </div>
   );
 }

@@ -1,4 +1,6 @@
-// src/components/BookmarkButton.tsx
+import bookmarkIcon from '../assets/bookmark.svg';
+import bookmarkFilledIcon from '../assets/bookmark-fill.svg';
+
 interface BookmarkButtonProps {
   isBookmarked: boolean;
   onToggle: () => void;
@@ -7,23 +9,20 @@ interface BookmarkButtonProps {
 function BookmarkButton({ isBookmarked, onToggle }: BookmarkButtonProps) {
   return (
     <button
+      aria-label="북마크"
       onClick={(e) => {
-        e.preventDefault(); // 카드를 감싼 <Link>의 페이지 이동이 같이 일어나지 않게 막기
+        e.preventDefault(); // 카드를 감싼 <Link>의 페이지 이동 막기
         onToggle();
       }}
-      className={`px-2.5 py-1.5 rounded-full outline outline-1 outline-offset-[-1px] flex justify-start items-center ${
-        isBookmarked ? 'bg-indigo-50 outline-indigo-200' : 'outline-gray-200'
+      className={`flex items-center px-2.5 py-1.5 rounded-full border ${
+        isBookmarked ? 'bg-primary-soft border-primary-line' : 'border-border'
       }`}
     >
-      <div className="size-4 relative overflow-hidden">
-        <div
-          className={`w-2 h-2.5 left-[4.33px] top-[2.67px] absolute outline outline-[1.20px] outline-offset-[-0.60px] ${
-            isBookmarked
-              ? 'bg-indigo-500 outline-indigo-500'
-              : 'outline-neutral-400'
-          }`}
-        ></div>
-      </div>
+      <img
+        src={isBookmarked ? bookmarkFilledIcon : bookmarkIcon}
+        alt=""
+        className="size-4"
+      />
     </button>
   );
 }

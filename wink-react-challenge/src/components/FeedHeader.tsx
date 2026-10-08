@@ -1,26 +1,30 @@
-// src/components/FeedHeader.tsx
 import { useState } from 'react';
 import CategoryTab from './CategoryTab';
 
 const categories = ['전체', '질문', '자유', '정보'];
 
 function FeedHeader() {
-  const [activeCategory, setActiveCategory] = useState('전체'); // 지금 선택된 카테고리
+  const [activeCategory, setActiveCategory] = useState('전체');
 
   return (
-    <div className="self-stretch px-5 pt-5 pb-3 bg-white border-b border-gray-200 flex flex-col justify-start items-start gap-4">
-      <div className="self-stretch inline-flex justify-between items-center">
-        <div className="text-neutral-900 text-xl font-bold">커뮤니티</div>
-        <div className="flex justify-start items-center gap-2">
-          <div className="size-9 bg-gray-100 rounded-full flex justify-center items-center text-gray-500">
+    <header className="flex flex-col gap-4 pt-5 px-5 pb-3 bg-surface border-b border-border">
+      <div className="flex items-center justify-between">
+        <h1 className="text-title font-bold text-text tracking-[-0.2px]">
+          커뮤니티
+        </h1>
+        <div className="flex items-center gap-2">
+          <button
+            aria-label="검색"
+            className="size-9 flex items-center justify-center rounded-full bg-muted text-icon text-[15px]"
+          >
             ⌕
-          </div>
-          <div className="px-3.5 py-2 bg-indigo-500 rounded-full flex justify-center items-center">
-            <div className="text-white text-xs font-bold">글쓰기</div>
-          </div>
+          </button>
+          <button className="px-3.5 py-2 rounded-full bg-primary text-label font-bold text-surface">
+            글쓰기
+          </button>
         </div>
       </div>
-      <div className="self-stretch inline-flex justify-start items-center gap-2">
+      <div className="flex gap-2">
         {categories.map((category) => (
           <CategoryTab
             key={category}
@@ -30,7 +34,7 @@ function FeedHeader() {
           />
         ))}
       </div>
-    </div>
+    </header>
   );
 }
 

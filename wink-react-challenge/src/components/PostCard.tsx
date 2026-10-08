@@ -1,12 +1,14 @@
-// src/components/PostCard.tsx
-import { useState } from 'react';
 import useToggle from '../hooks/useToggle';
+import CountPill from './CountPill';
 import BookmarkButton from './BookmarkButton';
+import heartIcon from '../assets/heart.svg';
+import heartFilledIcon from '../assets/heart-fill.svg';
 
 interface PostCardProps {
   author: string;
   timeLabel: string;
   title: string;
+  body: string;
   initialLikeCount: number;
   commentCount: number;
 }
@@ -15,59 +17,58 @@ function PostCard({
   author,
   timeLabel,
   title,
+  body,
   initialLikeCount,
   commentCount,
 }: PostCardProps) {
-  const [likeCount, setLikeCount] = useState(initialLikeCount);
   const [isLiked, toggleLiked] = useToggle(false);
   const [isBookmarked, toggleBookmarked] = useToggle(false);
-
-  const handleLikeClick = () => {
-    toggleLiked();
-    setLikeCount(isLiked ? likeCount - 1 : likeCount + 1);
-  };
+  const likeCount = initialLikeCount + (isLiked ? 1 : 0);
 
   return (
-    <div className="self-stretch p-4 bg-white rounded-2xl outline outline-1 outline-offset-[-1px] outline-gray-200 flex flex-col justify-start items-start gap-3">
-      <div className="self-stretch inline-flex justify-start items-center gap-2.5">
-        <div className="size-9 bg-gray-200 rounded-full"></div>
-        <div className="flex flex-col justify-start items-start gap-0.5">
-          <div className="text-neutral-900 text-sm font-bold">{author}</div>
-          <div className="text-neutral-400 text-xs font-normal">
-            {timeLabel}
-          </div>
+    <article className="flex flex-col gap-3 p-4 bg-surface border border-border rounded-card">
+      <div className="flex items-center gap-2.5">
+        <div className="size-9 shrink-0 rounded-full bg-border" />
+        <div className="flex flex-col gap-0.5">
+          <span className="text-body font-bold text-text">{author}</span>
+          <span className="text-caption text-text-secondary">{timeLabel}</span>
         </div>
       </div>
-      <div className="text-neutral-900 text-sm font-medium leading-5">
+
+      <h2 className="text-body font-medium text-text leading-[21px]">
         {title}
-      </div>
-      <div className="self-stretch pt-1 inline-flex justify-between items-center">
-        <div className="flex justify-start items-center gap-2">
-          <button
+      </h2>
+      <p className="text-body text-text-body leading-[1.65] line-clamp-2">
+        {body}
+      </p>
+
+      <div className="flex items-center justify-between pt-1">
+        <div className="flex items-center gap-2">
+          <CountPill
+            isActive={isLiked}
             onClick={(e) => {
-              e.preventDefault(); // 카드를 감싼 <Link>의 페이지 이동이 같이 일어나지 않게 막기
-              handleLikeClick();
+              e.preventDefault();
+              toggleLiked();
             }}
-            className={`px-2.5 py-1.5 rounded-full outline outline-1 outline-offset-[-1px] flex justify-start items-center gap-1.5 text-xs font-medium ${
-              isLiked
-                ? 'bg-red-50 outline-red-200 text-red-500'
-                : 'outline-gray-200 text-gray-500'
-            }`}
           >
-            {isLiked ? '♥' : '♡'} {likeCount}
-          </button>
-          <div className="px-2.5 py-1.5 rounded-full outline outline-1 outline-offset-[-1px] outline-gray-200 flex justify-start items-center gap-1.5">
-            <div className="text-gray-500 text-xs font-medium">
-              댓글 {commentCount}
-            </div>
-          </div>
+            <img
+              src={isLiked ? heartFilledIcon : heartIcon}
+              alt=""
+              className="size-4"
+            />
+            {likeCount}
+          </CountPill>
+          <CountPill>
+            <span>댓글</span>
+            <span>{commentCount}</span>
+          </CountPill>
         </div>
         <BookmarkButton
           isBookmarked={isBookmarked}
           onToggle={toggleBookmarked}
         />
       </div>
-    </div>
+    </article>
   );
 }
 
