@@ -1,11 +1,13 @@
-import { useState } from 'react';
 import CategoryTab from './CategoryTab';
 
 const categories = ['전체', '질문', '자유', '정보'];
 
-function FeedHeader() {
-  const [activeCategory, setActiveCategory] = useState('전체');
+interface FeedHeaderProps {
+  activeCategory: string;
+  onChangeCategory: (category: string) => void;
+}
 
+function FeedHeader({ activeCategory, onChangeCategory }: FeedHeaderProps) {
   return (
     <header className="flex flex-col gap-4 pt-5 px-5 pb-3 bg-surface border-b border-border">
       <div className="flex items-center justify-between">
@@ -30,7 +32,7 @@ function FeedHeader() {
             key={category}
             label={category}
             isActive={category === activeCategory}
-            onClick={() => setActiveCategory(category)}
+            onClick={() => onChangeCategory(category)}
           />
         ))}
       </div>

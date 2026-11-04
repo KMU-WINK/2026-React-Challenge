@@ -12,6 +12,7 @@ function BookmarkButton({ isBookmarked, onToggle }: BookmarkButtonProps) {
       aria-label="북마크"
       onClick={(e) => {
         e.preventDefault(); // 카드를 감싼 <Link>의 페이지 이동 막기
+        e.stopPropagation();
         onToggle();
       }}
       className={`flex items-center px-2.5 py-1.5 rounded-full border ${
