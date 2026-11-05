@@ -8,6 +8,7 @@ export default function BookmarkButton({ isBookmarked, onToggle }: BookmarkButto
     <button
       onClick={(e) => {
         e.preventDefault(); // 카드 전체가 Link라서 페이지 이동을 막음
+        e.stopPropagation();
         onToggle();
       }}
       className={`flex items-center rounded-full border px-[11px] py-[7px] ${

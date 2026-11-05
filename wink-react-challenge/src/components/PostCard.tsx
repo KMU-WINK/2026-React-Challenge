@@ -1,11 +1,14 @@
-import type { Post } from "../data/posts";
-import { useToggle } from "../hooks/useToggle";
+import { usePostStore } from "../store/postStore";
+import type { Post } from "../types";
+import { formatRelativeTime } from "../utils/time";
 import BookmarkButton from "./BookmarkButton";
 import CountPill from "./CountPill";
 
+// 좋아요/북마크의 "진짜 값"은 서버에 있으니 PostCard는 State 없이 보여주기만 하고,
+// 클릭하면 전역 스토어의 액션이 API를 호출함 (Props로 핸들러를 내려받을 필요 없음)
 export default function PostCard({ post }: { post: Post }) {
-  const [isLiked, toggleLike] = useToggle(false);
-  const [isBookmarked, toggleBookmark] = useToggle(post.saved);
+  const toggleLike = usePostStore((s) => s.toggleLike);
+  const toggleSave = usePostStore((s) => s.toggleSave);
 
   return (
     <article className="flex flex-col gap-3 rounded-card border border-border bg-surface p-[17px]">
@@ -14,7 +17,7 @@ export default function PostCard({ post }: { post: Post }) {
         <div className="flex flex-col gap-0.5">
           <span className="text-body font-bold text-text">{post.author}</span>
           <span className="text-caption text-text-secondary">
-            {post.category} · {post.time}
+            {post.tag} · {formatRelativeTime(post.createdAt)}
           </span>
         </div>
       </div>
@@ -23,17 +26,18 @@ export default function PostCard({ post }: { post: Post }) {
       <div className="flex items-center justify-between pt-1">
         <div className="flex items-center gap-2">
           <CountPill
-            active={isLiked}
+            active={post.liked}
             onClick={(e) => {
-              e.preventDefault(); // 좋아요를 눌러도 상세 페이지로 이동하지 않게
-              toggleLike();
+              e.preventDefault(); // 카드를 감싼 <Link> 이동 막기
+              e.stopPropagation();
+              toggleLike(post.id);
             }}
           >
-            {isLiked ? "♥" : "♡"} {post.likes + (isLiked ? 1 : 0)}
+            {post.liked ? "♥" : "♡"} {post.likeCount}
           </CountPill>
-          <CountPill>댓글 {post.comments.length}</CountPill>
+          <CountPill>댓글 {post.commentCount}</CountPill>
         </div>
-        <BookmarkButton isBookmarked={isBookmarked} onToggle={toggleBookmark} />
+        <BookmarkButton isBookmarked={post.saved} onToggle={() => toggleSave(post.id)} />
       </div>
     </article>
   );

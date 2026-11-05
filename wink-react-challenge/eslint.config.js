@@ -20,5 +20,9 @@ export default defineConfig([
     languageOptions: {
       globals: globals.browser,
     },
+    rules: {
+      // 요청을 다시 보낼 때 effect 안에서 setStatus('loading')으로 되돌리는 건 의도된 패턴
+      'react-hooks/set-state-in-effect': 'warn',
+    },
   },
 ])
