@@ -1,4 +1,3 @@
-// src/components/BookmarkButton.tsx
 interface BookmarkButtonProps {
   isBookmarked: boolean;
   onToggle: () => void;
@@ -8,7 +7,8 @@ function BookmarkButton({ isBookmarked, onToggle }: BookmarkButtonProps) {
   return (
     <button
       onClick={(e) => {
-        e.preventDefault(); // 카드를 감싼 <Link>의 페이지 이동이 같이 일어나지 않게 막기
+        e.preventDefault();
+        e.stopPropagation();
         onToggle();
       }}
       className={`px-2.5 py-1.5 rounded-full outline outline-1 outline-offset-[-1px] flex justify-start items-center ${
