@@ -1,15 +1,59 @@
-// src/pages/PostDetail.tsx
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { posts } from "../data/posts";
+import { fetchPost, createComment, toggleBookmark } from "../api/client";
+import { formatRelativeTime } from "../utils/time";
+import type { PostDetail as PostDetailType } from "../types";
 import BookmarkButton from "../components/BookmarkButton";
 import CommentSection from "../components/CommentSection";
 
 function PostDetail() {
   const { id } = useParams();
-  const post = posts.find((p) => p.id === Number(id));
-  const [isBookmarked, setIsBookmarked] = useState(false);
+  const [post, setPost] = useState<PostDetailType | null>(null);
+  const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
 
+  useEffect(() => {
+    if (!id) return;
+    let cancelled = false;
+    setStatus("loading");
+
+    fetchPost(id)
+      .then((data) => {
+        if (cancelled) return;
+        setPost(data);
+        setStatus("ready");
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setStatus("error");
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [id]);
+
+
+  const handleAddComment = (text: string) => {
+    if (!id) return;
+    createComment(id, text).then((comment) => {
+      setPost((prev) =>
+        prev ? { ...prev, comments: [...prev.comments, comment], commentCount: prev.commentCount + 1 } : prev
+      );
+    });
+  };
+
+  const handleToggleBookmark = () => {
+    if (!id) return;
+
+    toggleBookmark(id).then(({ saved }) => {
+      setPost((prev) =>
+        prev ? { ...prev, saved } : prev
+      );
+    });
+  };
+
+  if (status === "loading") return <p>불러오는 중...</p>;
+  if (status === "error") return <p>게시글을 불러오지 못했습니다.</p>;
   if (!post) return <p>게시글을 찾을 수 없어요.</p>;
 
   return (
@@ -27,7 +71,7 @@ function PostDetail() {
           <div className="size-10 bg-gray-200 rounded-full"></div>
           <div className="flex flex-col justify-start items-start gap-0.5">
             <div className="text-neutral-900 text-sm font-bold">{post.author}</div>
-            <div className="text-neutral-400 text-xs font-normal">{post.timeLabel}</div>
+            <div className="text-neutral-400 text-xs font-normal"> {formatRelativeTime(post.createdAt)} </div>
           </div>
         </div>
 
@@ -41,19 +85,22 @@ function PostDetail() {
         <div className="self-stretch py-3.5 flex justify-between items-center border-t border-b border-gray-200">
           <div className="flex items-center gap-2">
             <div className="px-2.5 py-1.5 rounded-full outline outline-1 outline-offset-[-1px] outline-gray-200 flex items-center gap-1.5">
-              <div className="text-gray-500 text-xs font-medium">♡ {post.likeCount}</div>
+              <div className="text-gray-500 text-xs font-medium"> ♡ {post.likeCount}</div>
             </div>
             <div className="px-2.5 py-1.5 rounded-full outline outline-1 outline-offset-[-1px] outline-gray-200 flex items-center gap-1.5">
               <div className="text-gray-500 text-xs font-medium">댓글 {post.commentCount}</div>
             </div>
           </div>
           <BookmarkButton
-            isBookmarked={isBookmarked}
-            onToggle={() => setIsBookmarked(!isBookmarked)}
+            isBookmarked={post.saved}
+            onToggle={handleToggleBookmark}
           />
         </div>
 
-        <CommentSection />
+        <CommentSection
+          comments={post.comments}
+          onSubmit={handleAddComment}
+        />
       </div>
     </div>
   );
