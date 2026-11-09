@@ -1,57 +1,74 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { BrowserRouter, Link, Route, Routes } from "react-router-dom";
-import { initialPosts } from "./data/posts";
-import type { Post, PostComment } from "./data/posts";
+import type { Post } from "./data/posts";
 import PostList from "./pages/PostList";
 import PostDetail from "./pages/PostDetail";
+import { fetchPosts, toggleLike, toggleBookmark } from "./api/client";
 
 export default function App() {
-  // 목록과 상세 화면이 같은 상태를 사용하도록 App에서 관리해요.
-  const [posts, setPosts] = useState<Post[]>(initialPosts);
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [status, setStatus] = useState<"loading" | "ready" | "error">(
+    "loading",
+  );
 
-  function handleToggleLike(id: number) {
-    setPosts((previousPosts) =>
-      previousPosts.map((post) =>
-        post.id === id
-          ? {
-              ...post,
-              liked: !post.liked,
-              likes: post.likes + (post.liked ? -1 : 1),
-            }
-          : post,
-      ),
-    );
-  }
+  // 처음 화면이 열리면 서버에서 게시글을 가져온다.
+  useEffect(() => {
+    let cancelled = false;
 
-  function handleToggleBookmark(id: number) {
-    setPosts((previousPosts) =>
-      previousPosts.map((post) =>
-        post.id === id ? { ...post, bookmarked: !post.bookmarked } : post,
-      ),
-    );
-  }
+    fetchPosts()
+      .then((data) => {
+        if (cancelled) return;
+        setPosts(data);
+        setStatus("ready");
+      })
+      .catch((error) => {
+        if (cancelled) return;
+        console.error("게시글 조회 실패:", error);
+        setStatus("error");
+      });
 
-  function handleAddComment(id: number, text: string) {
-    const trimmedText = text.trim();
-    if (!trimmedText) return;
-
-    const newComment: PostComment = {
-      id: crypto.randomUUID(),
-      author: "나",
-      text: trimmedText,
+    return () => {
+      cancelled = true;
     };
+  }, []);
 
-    setPosts((previousPosts) =>
-      previousPosts.map((post) =>
-        post.id === id
-          ? {
-              ...post,
-              comments: post.comments + 1,
-              commentItems: [...post.commentItems, newComment],
-            }
-          : post,
-      ),
-    );
+  // 목록 화면 좋아요
+  async function handleToggleLike(id: number) {
+    try {
+      const result: { liked: boolean; likeCount: number } =
+        await toggleLike(id);
+
+      setPosts((previousPosts) =>
+        previousPosts.map((post) =>
+          post.id === id
+            ? {
+                ...post,
+                liked: result.liked,
+                likes: result.likeCount,
+              }
+            : post,
+        ),
+      );
+    } catch (error) {
+      console.error("좋아요 요청 실패:", error);
+      alert("좋아요 처리에 실패했습니다.");
+    }
+  }
+
+  // 목록 화면 북마크
+  async function handleToggleBookmark(id: number) {
+    try {
+      const result: { saved: boolean } = await toggleBookmark(id);
+
+      setPosts((previousPosts) =>
+        previousPosts.map((post) =>
+          post.id === id ? { ...post, bookmarked: result.saved } : post,
+        ),
+      );
+    } catch (error) {
+      console.error("북마크 요청 실패:", error);
+      alert("북마크 처리에 실패했습니다.");
+    }
   }
 
   return (
@@ -62,24 +79,22 @@ export default function App() {
             <Route
               path="/"
               element={
-                <PostList
-                  posts={posts}
-                  onToggleLike={handleToggleLike}
-                  onToggleBookmark={handleToggleBookmark}
-                />
+                status === "loading" ? (
+                  <p className="p-5">게시글을 불러오는 중...</p>
+                ) : status === "error" ? (
+                  <p className="p-5">게시글을 불러오지 못했습니다.</p>
+                ) : (
+                  <PostList
+                    posts={posts}
+                    onToggleLike={handleToggleLike}
+                    onToggleBookmark={handleToggleBookmark}
+                  />
+                )
               }
             />
-            <Route
-              path="/posts/:id"
-              element={
-                <PostDetail
-                  posts={posts}
-                  onToggleLike={handleToggleLike}
-                  onToggleBookmark={handleToggleBookmark}
-                  onAddComment={handleAddComment}
-                />
-              }
-            />
+
+            <Route path="/posts/:id" element={<PostDetail />} />
+
             <Route
               path="*"
               element={

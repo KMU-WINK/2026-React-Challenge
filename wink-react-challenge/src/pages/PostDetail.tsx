@@ -1,24 +1,98 @@
+import { useEffect, useState } from "react";
+import {
+  fetchPostDetail,
+  createComment,
+  toggleLike,
+  toggleBookmark,
+} from "../api/client";
 import { Link, useParams } from "react-router-dom";
 import type { Post } from "../data/posts";
 import BookmarkButton from "../components/BookmarkButton";
 import CommentSection from "../components/CommentSection";
 import { HeartIcon } from "../components/Icons";
 
-type PostDetailProps = {
-  posts: Post[];
-  onToggleLike: (id: number) => void;
-  onToggleBookmark: (id: number) => void;
-  onAddComment: (id: number, text: string) => void;
-};
-
-export default function PostDetail({
-  posts,
-  onToggleLike,
-  onToggleBookmark,
-  onAddComment,
-}: PostDetailProps) {
+export default function PostDetail() {
   const { id } = useParams();
-  const post = posts.find((item) => item.id === Number(id));
+
+  const [post, setPost] = useState<Post | null>(null);
+  const [status, setStatus] = useState<"loading" | "ready" | "error">(
+    "loading",
+  );
+
+  useEffect(() => {
+    if (!id) return;
+
+    let cancelled = false;
+
+    fetchPostDetail(Number(id))
+      .then((data) => {
+        if (cancelled) return;
+        setPost(data);
+        setStatus("ready");
+      })
+      .catch((error) => {
+        if (cancelled) return;
+        console.error(error);
+        setStatus("error");
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [id]);
+
+  async function handleAddComment(text: string) {
+    if (!post) return;
+
+    const trimmedText = text.trim();
+    if (!trimmedText) return;
+
+    try {
+      await createComment(post.id, trimmedText);
+      const updatedPost = await fetchPostDetail(post.id);
+      setPost(updatedPost);
+    } catch (error) {
+      console.error("댓글 등록 실패:", error);
+      alert("댓글 등록에 실패했습니다.");
+    }
+  }
+
+  async function handleDetailLike(id: number) {
+    try {
+      const result: { liked: boolean; likeCount: number } =
+        await toggleLike(id);
+
+      setPost((previous) =>
+        previous
+          ? { ...previous, liked: result.liked, likes: result.likeCount }
+          : previous,
+      );
+    } catch (error) {
+      console.error("좋아요 실패:", error);
+      alert("좋아요 처리에 실패했습니다.");
+    }
+  }
+
+  async function handleDetailBookmark(id: number) {
+    try {
+      const result: { saved: boolean } = await toggleBookmark(id);
+
+      setPost((previous) =>
+        previous ? { ...previous, bookmarked: result.saved } : previous,
+      );
+    } catch (error) {
+      console.error("북마크 실패:", error);
+      alert("북마크 처리에 실패했습니다.");
+    }
+  }
+
+  if (status === "loading") {
+    return <p className="p-5">게시글을 불러오는 중...</p>;
+  }
+
+  if (status === "error") {
+    return <p className="p-5">게시글을 불러오지 못했습니다.</p>;
+  }
 
   if (!post) {
     return (
@@ -68,7 +142,7 @@ export default function PostDetail({
           <div className="flex items-center gap-2">
             <button
               type="button"
-              onClick={() => onToggleLike(post.id)}
+              onClick={() => handleDetailLike(post.id)}
               aria-label={post.liked ? "좋아요 취소" : "좋아요"}
               aria-pressed={post.liked}
               className={`flex h-[30px] cursor-pointer items-center gap-[5px] rounded-[999px] border px-[11px] ${
@@ -90,7 +164,7 @@ export default function PostDetail({
           </div>
           <BookmarkButton
             active={post.bookmarked}
-            onToggle={() => onToggleBookmark(post.id)}
+            onToggle={() => handleDetailBookmark(post.id)}
           />
         </div>
 
@@ -98,7 +172,7 @@ export default function PostDetail({
           key={post.id}
           comments={post.commentItems}
           totalCount={post.comments}
-          onAddComment={(text) => onAddComment(post.id, text)}
+          onAddComment={handleAddComment}
         />
       </div>
     </div>
