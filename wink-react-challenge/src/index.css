@@ -1,0 +1,42 @@
+@import "@fontsource/noto-sans-kr/400.css";
+@import "@fontsource/noto-sans-kr/500.css";
+@import "@fontsource/noto-sans-kr/700.css";
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #4c6ef5;
+  --color-like: #f2405d;
+  --color-text: #14161a;
+  --color-text-body: #4a5058;
+  --color-text-secondary: #8a9099;
+  --color-border: #e8eaee;
+  --color-surface: #ffffff;
+  --color-bg: #f7f8fa;
+}
+
+:root {
+  font-family: "Noto Sans KR", sans-serif;
+  color: #14161a;
+  background: #f7f8fa;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  min-width: 320px;
+  background: #f7f8fa;
+  font-family: "Noto Sans KR", sans-serif;
+}
+
+button {
+  font: inherit;
+}
